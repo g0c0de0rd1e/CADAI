@@ -1,7 +1,9 @@
-import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QToolButton
+# interface.py
+
+from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QToolButton
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
+from logic import MainWindowLogic
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -15,6 +17,9 @@ class MainWindow(QMainWindow):
         
         self.main_layout = QVBoxLayout()
         self.central_widget.setLayout(self.main_layout)
+
+        # Инициализация логики перед вызовом create_buttons
+        self.logic = MainWindowLogic(self)
         
         self.theme = "light"
         self.create_theme_toggle()
@@ -33,9 +38,9 @@ class MainWindow(QMainWindow):
 
     def create_buttons(self):
         buttons = [
-            {"text": "Импортировать данные", "color": "#3498db", "size": 250},
-            {"text": "Экспортировать данные", "color": "#e74c3c", "size": 250},
-            {"text": "Просмотр", "color": "#2ecc71", "size": 250}
+            {"text": "Импортировать данные", "color": "#3498db", "size": 250, "handler": self.logic.import_data},
+            {"text": "Экспортировать данные", "color": "#e74c3c", "size": 250, "handler": self.logic.export_data},
+            {"text": "Просмотр", "color": "#2ecc71", "size": 250, "handler": self.logic.view_data}
         ]
         
         button_layout = QHBoxLayout()
@@ -46,8 +51,8 @@ class MainWindow(QMainWindow):
             button.setStyleSheet(f"""
                 QPushButton {{
                     background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                                      stop:0 rgba({self.hex_to_rgb(self.lighter_color(button_data['color']))}),
-                                                      stop:1 rgba({self.hex_to_rgb(button_data['color'])}));
+                                                    stop:0 rgba({self.logic.hex_to_rgb(self.logic.lighter_color(button_data['color']))}),
+                                                    stop:1 rgba({self.logic.hex_to_rgb(button_data['color'])}));
                     color: {'white' if self.theme == 'light' else '#333'};
                     border-radius: 10px;
                     min-width: {button_data['size']}px;
@@ -58,43 +63,18 @@ class MainWindow(QMainWindow):
                 }}
                 QPushButton:hover {{
                     background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                                      stop:0 rgba({self.hex_to_rgb(self.lighter_color(button_data['color']))}),
-                                                      stop:1 rgba({self.hex_to_rgb(self.darker_color(button_data['color']))}));
+                                                    stop:0 rgba({self.logic.hex_to_rgb(self.logic.lighter_color(button_data['color']))}),
+                                                    stop:1 rgba({self.logic.hex_to_rgb(self.logic.darker_color(button_data['color']))}));
                     opacity: 0.9;
                 }}
             """)
-            
+            button.clicked.connect(button_data["handler"])
             button.setFont(QFont("Arial", 12))
             button_layout.addWidget(button)
             button_layout.addStretch()
 
-    def hex_to_rgb(self, hex_color):
-        r = int(hex_color.lstrip('#')[0:2], 16)
-        g = int(hex_color.lstrip('#')[2:4], 16)
-        b = int(hex_color.lstrip('#')[4:6], 16)
-        return f"{r}, {g}, {b}"
-
-    def lighter_color(self, hex_color):
-        r, g, b = tuple(int(hex_color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
-        r, g, b = min(255, r+50), min(255, g+50), min(255, b+50)
-        return f"#{r:02x}{g:02x}{b:02x}"
-
-    def darker_color(self, hex_color):
-        r, g, b = tuple(int(hex_color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
-        r, g, b = max(0, r-50), max(0, g-50), max(0, b-50)
-        return f"#{r:02x}{g:02x}{b:02x}"
-
     def switch_theme(self):
-        if self.theme == "light":
-            self.theme = "dark"
-            self.theme_toggle.setText("Тёмная тема")
-            self.theme_toggle.setStyleSheet("background-color: #333; color: white;")
-        else:
-            self.theme = "light"
-            self.theme_toggle.setText("Светлая тема")
-            self.theme_toggle.setStyleSheet("background-color: #f0f0f0; color: black;")
-        
-        self.update_buttons()
+        self.logic.switch_theme()
 
     def update_buttons(self):
         for i in range(self.main_layout.count()):
@@ -105,12 +85,3 @@ class MainWindow(QMainWindow):
                     if widget_item.widget():
                         button = widget_item.widget()
                         button.setStyleSheet(button.styleSheet())
-
-def main():
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec_())
-
-if __name__ == "__main__":
-    main()
