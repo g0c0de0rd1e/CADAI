@@ -1,5 +1,6 @@
 # shapes.py
 from OpenGL.GL import *
+from OpenGL.GLU import *
 
 class Cube:
     def __init__(self):
@@ -59,6 +60,68 @@ class Cube:
         glVertex3f(-1.0,  1.0, -1.0)
         
         glEnd()
+        glPopMatrix()
+
+    def translate(self, dx, dy, dz):
+        self.position[0] += dx
+        self.position[1] += dy
+        self.position[2] += dz
+
+    def rotate(self, angle, axis):
+        self.rotation[axis] += angle
+
+    def scale_object(self, sx, sy, sz):
+        self.scale_factors[0] *= sx
+        self.scale_factors[1] *= sy
+        self.scale_factors[2] *= sz
+
+class Sphere:
+    def __init__(self):
+        self.position = [0.0, 0.0, 0.0]
+        self.rotation = [0.0, 0.0, 0.0]
+        self.scale_factors = [1.0, 1.0, 1.0]
+
+    def draw(self):
+        glPushMatrix()
+        glTranslatef(*self.position)
+        glScalef(*self.scale_factors)
+        glRotatef(self.rotation[0], 1, 0, 0)
+        glRotatef(self.rotation[1], 0, 1, 0)
+        glRotatef(self.rotation[2], 0, 0, 1)
+        glColor3f(0.5, 0.5, 0.5)  # Серый цвет для сферы
+        quad = gluNewQuadric()
+        gluSphere(quad, 1.0, 32, 32)
+        glPopMatrix()
+
+    def translate(self, dx, dy, dz):
+        self.position[0] += dx
+        self.position[1] += dy
+        self.position[2] += dz
+
+    def rotate(self, angle, axis):
+        self.rotation[axis] += angle
+
+    def scale_object(self, sx, sy, sz):
+        self.scale_factors[0] *= sx
+        self.scale_factors[1] *= sy
+        self.scale_factors[2] *= sz
+
+class Cone:
+    def __init__(self):
+        self.position = [0.0, 0.0, 0.0]
+        self.rotation = [0.0, 0.0, 0.0]
+        self.scale_factors = [1.0, 1.0, 1.0]
+
+    def draw(self):
+        glPushMatrix()
+        glTranslatef(*self.position)
+        glScalef(*self.scale_factors)
+        glRotatef(self.rotation[0], 1, 0, 0)
+        glRotatef(self.rotation[1], 0, 1, 0)
+        glRotatef(self.rotation[2], 0, 0, 1)
+        glColor3f(1.0, 0.5, 0.0)  # Оранжевый цвет для конуса
+        quad = gluNewQuadric()
+        gluCylinder(quad, 1.0, 0.0, 2.0, 32, 32)
         glPopMatrix()
 
     def translate(self, dx, dy, dz):
