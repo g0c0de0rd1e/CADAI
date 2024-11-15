@@ -1,7 +1,4 @@
-# logic.py
-
 from PyQt5.QtWidgets import QFileDialog
-from glwidget import GLWidget
 
 class MainWindowLogic:
     def __init__(self, window):
@@ -36,7 +33,6 @@ class MainWindowLogic:
         self.window.update_buttons()
 
     def import_data(self):
-        # Открытие проводника для выбора файла
         options = QFileDialog.Options()
         file_path, _ = QFileDialog.getOpenFileName(self.window, "Импортировать STEP файл", "", "STEP Files (*.step);;All Files (*)", options=options)
         if file_path:
@@ -51,5 +47,4 @@ class MainWindowLogic:
             # Здесь можно добавить логику для экспорта файла
 
     def view_data(self):
-        self.window.glWidget = GLWidget()
-        self.window.setCentralWidget(self.window.glWidget)
+        self.window.open_view_window()

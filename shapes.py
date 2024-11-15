@@ -1,5 +1,3 @@
-# shapes.py
-
 from OpenGL.GL import *
 
 class Cube:
@@ -48,4 +46,15 @@ class Cube:
         glVertex3f(-1.0,  1.0,  1.0)
         glVertex3f(-1.0,  1.0, -1.0)
         
+        glEnd()
+
+class Grid:
+    def draw(self):
+        glColor3f(0.5, 0.5, 0.5)  # Серый цвет для сетки
+        glBegin(GL_LINES)
+        for i in range(-10, 11):
+            glVertex3f(i, 0, -10)
+            glVertex3f(i, 0, 10)
+            glVertex3f(-10, 0, i)
+            glVertex3f(10, 0, i)
         glEnd()
